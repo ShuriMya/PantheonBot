@@ -48,14 +48,14 @@ def format_full_profile_embed(tft_data):
         embed.add_field(
             name="**Dernière game**",
             value=(
-                f"Le {tft_data['activity']['last_game']['date'].isoformat()}\n"
-                f"{tft_data['activity']['last_game']['game_type']}\n"
-                f"Résultat: {tft_data['activity']['last_game']['position']}\u1D49 position"
+                f"{tft_data['activity']['last_game']['date'].strftime('Le %d/%m/%Y à %H:%M')} - "
+                f"{tft_data['activity']['last_game']['game_type']} - "
+                f"{tft_data['activity']['last_game']['position']}\u1D49 place"
             ),
             inline=False,
         )
 
-    if "activity" in tft_data and "last_game" in tft_data["num_recent_games"]:
+    if "activity" in tft_data and "num_recent_games" in tft_data["activity"]:
         embed.add_field(
             name="**Activité**",
             value=(

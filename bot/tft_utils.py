@@ -19,11 +19,11 @@ def get_match_activity(username):
         def format_response(response):
             queue_id = response["info"]["queue_id"]
             if queue_id == 1090:
-                game_type = "Normal game"
+                game_type = "Normal"
             elif queue_id == 1100:
-                game_type = "Ranked game"
+                game_type = "Ranked"
             else:
-                game_type = "Custom game"
+                game_type = "Custom"
 
             return {
                 "date": datetime.fromtimestamp(
