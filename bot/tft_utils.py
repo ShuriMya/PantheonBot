@@ -93,11 +93,17 @@ def get_match_activity(username):
 
 def get_tft_profile(username):
     def format_response(response):
+        if not response:
+            return {
+                "summoner_name": username,
+                "rank": "Unranked",
+                "lp": 0,
+                "games": 0,
+                "wins": 0,
+                "winrate": 0,
+            }
+
         single_resp = response[0]
-
-        if not single_resp:
-            return {}
-
         formatted_tier = single_resp["tier"].title()
         if formatted_tier in ("Master", "Grandmaster", "Challenger"):
             formatted_rank = formatted_tier
@@ -123,9 +129,6 @@ def get_tft_profile(username):
 
 def get_tft_full_profile(username):
     basic_profile = get_tft_profile(username)
-
-    if not basic_profile:
-        return {}
 
     return {
         **basic_profile,

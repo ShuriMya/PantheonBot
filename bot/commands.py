@@ -3,6 +3,7 @@ from discord.ext import commands
 from requests.utils import quote
 
 from bot.tft_utils import get_tft_profile, get_tft_full_profile
+from bot.db_utils import register_member, fetch_member
 
 
 def get_user_not_found_embed(username):
@@ -10,6 +11,19 @@ def get_user_not_found_embed(username):
     embed.add_field(
         name="**Pas de profil trouvé**",
         value=f"Je n'ai pas trouvé **{username}** sur le serveur EUW",
+        inline=False,
+    )
+    return embed
+
+
+def get_unregistered_embed():
+    embed = discord.Embed()
+    embed.add_field(
+        name="**Pas de profil enregistré**",
+        value=(
+            "Vous n'avez pas enregistré votre compte TFT, "
+            "pour ce faire veuillez utiliser la commande `+register` suivi de votre pseudo TFT. \n"
+        ),
         inline=False,
     )
     return embed
@@ -31,7 +45,7 @@ def format_profile_embed(tft_data):
         inline=False,
     )
     embed.add_field(
-        name="**Parties**",
+        name="**Parties classées**",
         value=f"{tft_data['games']}",
     )
     embed.add_field(
@@ -75,7 +89,15 @@ class UserCommands(commands.Cog):
 
     @commands.command()
     async def profile(self, ctx, *args):
-        username = " ".join(args)
+        if not args:
+            username = fetch_member(self.bot.db_conn, ctx.author.id)
+        else:
+            username = " ".join(args)
+
+        if not username:
+            await ctx.send(embed=get_unregistered_embed())
+            return
+
         tft_data = get_tft_profile(username)
 
         if tft_data:
@@ -86,7 +108,15 @@ class UserCommands(commands.Cog):
 
     @commands.command()
     async def full(self, ctx, *args):
-        username = " ".join(args)
+        if not args:
+            username = fetch_member(self.bot.db_conn, ctx.author.id)
+        else:
+            username = " ".join(args)
+
+        if not username:
+            await ctx.send(embed=get_unregistered_embed())
+            return
+
         tft_data = get_tft_full_profile(username)
 
         if tft_data:
@@ -94,3 +124,28 @@ class UserCommands(commands.Cog):
             await ctx.send(embed=embed)
         else:
             await ctx.send(embed=get_user_not_found_embed(username))
+
+    @commands.command()
+    async def register(self, ctx, *args):
+        tft_username = " ".join(args)
+        embed = discord.Embed()
+
+        try:
+            register_member(self.bot.db_conn, ctx.author.id, tft_username)
+        except Exception:
+            embed.add_field(
+                name="**Erreur lors de l'enregistrement**",
+                value=(
+                    f"Je n'ai pas réussi à enregistrer votre compte **{tft_username}** dans la base de données. "
+                    "Veuillez contacter un modérateur."
+                ),
+                inline=False,
+            )
+        else:
+            embed.add_field(
+                name="**Profil enregistré**",
+                value=f"Votre profil TFT **{tft_username}** a bien été lié à votre compte Discord",
+                inline=False,
+            )
+        finally:
+            await ctx.send(embed=embed)
