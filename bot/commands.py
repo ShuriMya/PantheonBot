@@ -136,8 +136,8 @@ class UserCommands(commands.Cog):
             embed.add_field(
                 name="**Erreur lors de l'enregistrement**",
                 value=(
-                    f"Je n'ai pas réussi à enregistrer votre compte **{tft_username}** dans la base de données. "
-                    "Veuillez contacter un modérateur."
+                    f"Je n'ai pas réussi à trouver votre compte TFT **{tft_username}** sur le serveur EUW.\n"
+                    "Êtes-vous sûr que votre compte TFT existe et est bien orthographié ?"
                 ),
                 inline=False,
             )

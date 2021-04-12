@@ -15,7 +15,7 @@ def register_member(db_conn, discord_id, tft_username):
     try:
         riot_ids = get_riot_id(tft_username)
     except UserNotFoundError:
-        return
+        raise
 
     cur = db_conn.cursor()
     cur.execute(
